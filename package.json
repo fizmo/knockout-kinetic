@@ -1,0 +1,17 @@
+{
+  "author": "Christopher Currie <christopher@currie.com>",
+  "name": "knockout-kinetic",
+  "description": "Knockout plugin for KineticJS",
+  "version": "0.1.0",
+  "homepage": "https://github.com/christophercurrie/knockout-kinetic",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/christophercurrie/knockout-kinetic.git"
+  },
+  "devDependencies": {
+    "coffee-script": "1.3.3"
+  },
+  "scripts": {
+    "prepublish": "coffee -c knockout-kinetic.coffee"
+  }
+}
