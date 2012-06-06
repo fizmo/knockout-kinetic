@@ -1,7 +1,7 @@
 knockout-kinetic
 ================
 
-A KnockoutJS plugin for KineticJS.
+A KineticJS plugin for KnockoutJS.
 
 Overview
 --------
