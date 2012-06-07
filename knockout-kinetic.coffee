@@ -1,21 +1,14 @@
 ###
-Kinetic plugin for Knockout. Version 0.1.0
+Knockout Kinetic plugin version 0.1.1
+Copyright 2012 Christopher Currie - https://github.com/christophercurrie
+License: MIT (http://www.opensource.org/licenses/mit-license.php)
 ###
 
 do (factory = (ko, exports) ->
 
-  expandConfig = (config) ->
-    if not config then return {}
-    temp = if typeof config == 'function' then config() else config
-    if not (temp instanceof Object) then return temp
-    result = {}
-    for own key, value of temp
-      result[key] = expandConfig value
-    result
-
   makeBindingHandler = (nodeFactory) ->
     init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) ->
-      config = expandConfig valueAccessor()
+      config = ko.utils.unwrapObservable valueAccessor()
       node = nodeFactory(config, element.parentNode)
       innerContext = bindingContext.extend
         parentNode: node
@@ -28,7 +21,7 @@ do (factory = (ko, exports) ->
 
     update: (element, valueAccessor) ->
       node = element._kk
-      config = expandConfig valueAccessor()
+      config = ko.utils.unwrapObservable valueAccessor()
       updated = false
       for key, value of config
         # Hack! I don't think `attrs` is a part of the Kinetic Node API
