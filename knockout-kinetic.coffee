@@ -6,9 +6,15 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
 do (factory = (ko, exports) ->
 
+  expandConfig = (config) ->
+      result = {}
+      for key, value of ko.utils.unwrapObservable config
+        result[key] = ko.utils.unwrapObservable value
+      result
+
   makeBindingHandler = (nodeFactory) ->
     init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) ->
-      config = ko.utils.unwrapObservable valueAccessor()
+      config = expandConfig valueAccessor()
       node = nodeFactory(config, element.parentNode)
       innerContext = bindingContext.extend
         parentNode: node
@@ -21,7 +27,7 @@ do (factory = (ko, exports) ->
 
     update: (element, valueAccessor) ->
       node = element._kk
-      config = ko.utils.unwrapObservable valueAccessor()
+      config = expandConfig valueAccessor()
       updated = false
       for key, value of config
         # Hack! I don't think `attrs` is a part of the Kinetic Node API
