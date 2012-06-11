@@ -8,6 +8,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
 
 (function() {
+  var __hasProp = {}.hasOwnProperty;
 
   (function(factory) {
     if (typeof require === 'function' && typeof exports === 'object' && typeof module === 'object') {
@@ -51,20 +52,28 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
           };
         },
         update: function(element, valueAccessor) {
-          var config, key, node, updated, value;
+          var config, current, key, node, updated, value;
           node = element._kk;
           config = expandConfig(valueAccessor());
+          current = node.getAttrs();
           updated = false;
           for (key in config) {
+            if (!__hasProp.call(config, key)) continue;
             value = config[key];
-            if (value === node.attrs[key]) {
-              continue;
+            if (value !== current[key]) {
+              updated = true;
+              break;
             }
-            node.attrs[key] = value;
-            updated = true;
           }
-          if (updated && node.getParent()) {
-            return node.getLayer().draw();
+          node.setAttrs(config);
+          if (updated) {
+            if (typeof node.draw === 'function') {
+              return node.draw();
+            } else {
+              if (node.getParent()) {
+                return node.getLayer().draw();
+              }
+            }
           }
         }
       };

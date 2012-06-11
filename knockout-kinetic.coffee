@@ -28,13 +28,16 @@ do (factory = (ko, exports) ->
     update: (element, valueAccessor) ->
       node = element._kk
       config = expandConfig valueAccessor()
+      current = node.getAttrs()
       updated = false
-      for key, value of config
-        # Hack! I don't think `attrs` is a part of the Kinetic Node API
-        if value == node.attrs[key] then continue
-        node.attrs[key] = value
-        updated = true
-      node.getLayer().draw() if updated and node.getParent()
+      for own key, value of config
+        if value != current[key]
+          updated = true
+          break
+      node.setAttrs(config)
+      if updated
+        if typeof node.draw == 'function' then node.draw() else
+          node.getLayer().draw() if node.getParent()
 
   for nodeType, ctor of Kinetic when typeof ctor == 'function'
     nodeFactory = do (nodeType, ctor) ->
