@@ -1,6 +1,12 @@
 Version History
 ===============
 
+0.1.3
+-----
+* Stop using the internal attrs member and call get/setAttrs methods
+* Detect draw() function on node, so that Stage.draw() gets called
+
+
 0.1.2
 -----
 A bugfix release addressing an issue with unwrapping observables,
