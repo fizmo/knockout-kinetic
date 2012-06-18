@@ -17,10 +17,14 @@ do (factory = (ko, exports) ->
     for own key, value of animations
       do (key, value) ->
         trans = null
-        if typeof node[key] == 'function' and ko.isSubscribable value
-          value.subscribe (newValue) ->
-            if trans then trans.stop()
-            trans = node[key] newValue if newValue
+        if typeof node[key] == 'function'
+          fn = (value) -> node[key](value)
+          if ko.isSubscribable value
+            value.subscribe (newValue) ->
+              if trans then trans.stop()
+              trans = fn newValue if newValue
+          else
+            fn value if value
     return
 
   applyEvents = (node, element, events) ->

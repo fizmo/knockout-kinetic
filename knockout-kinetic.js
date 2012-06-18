@@ -36,17 +36,26 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
     applyAnimations = function(node, animations) {
       var key, value, _fn;
       _fn = function(key, value) {
-        var trans;
+        var fn, trans;
         trans = null;
-        if (typeof node[key] === 'function' && ko.isSubscribable(value)) {
-          return value.subscribe(function(newValue) {
-            if (trans) {
-              trans.stop();
+        if (typeof node[key] === 'function') {
+          fn = function(value) {
+            return node[key](value);
+          };
+          if (ko.isSubscribable(value)) {
+            return value.subscribe(function(newValue) {
+              if (trans) {
+                trans.stop();
+              }
+              if (newValue) {
+                return trans = fn(newValue);
+              }
+            });
+          } else {
+            if (value) {
+              return fn(value);
             }
-            if (newValue) {
-              return trans = node[key](newValue);
-            }
-          });
+          }
         }
       };
       for (key in animations) {
