@@ -21,6 +21,13 @@ do (factory = (ko, exports) ->
           value.subscribe (newValue) ->
             if trans then trans.stop()
             trans = node[key] newValue if newValue
+    return
+
+  applyEvents = (node, element, events) ->
+    for own key, value of events
+      do (key, value) -> node.on key, (evt) ->
+        value element, evt
+    return
 
   redraw = (node) ->
     if node.getStage()
@@ -66,6 +73,7 @@ do (factory = (ko, exports) ->
       element.style.display = 'none' if element.style # won't have style if it's virtual
       element._kk = node
       applyAnimations node, allBindingsAccessor()['animate']
+      applyEvents node, element, allBindingsAccessor()['events']
       { controlsDescendantBindings: true }
 
     update: (element, valueAccessor) ->

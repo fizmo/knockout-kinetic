@@ -19,7 +19,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
       return factory(ko, ko.kinetic = {});
     }
   })(function(ko, exports) {
-    var applyAnimations, bindingName, ctor, expandConfig, makeBindingHandler, nodeFactory, nodeType, redraw;
+    var applyAnimations, applyEvents, bindingName, ctor, expandConfig, makeBindingHandler, nodeFactory, nodeType, redraw;
     expandConfig = function(config) {
       var key, realValue, result, value, _ref;
       result = {};
@@ -34,27 +34,39 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
       return result;
     };
     applyAnimations = function(node, animations) {
-      var key, value, _results;
-      _results = [];
+      var key, value, _fn;
+      _fn = function(key, value) {
+        var trans;
+        trans = null;
+        if (typeof node[key] === 'function' && ko.isSubscribable(value)) {
+          return value.subscribe(function(newValue) {
+            if (trans) {
+              trans.stop();
+            }
+            if (newValue) {
+              return trans = node[key](newValue);
+            }
+          });
+        }
+      };
       for (key in animations) {
         if (!__hasProp.call(animations, key)) continue;
         value = animations[key];
-        _results.push((function(key, value) {
-          var trans;
-          trans = null;
-          if (typeof node[key] === 'function' && ko.isSubscribable(value)) {
-            return value.subscribe(function(newValue) {
-              if (trans) {
-                trans.stop();
-              }
-              if (newValue) {
-                return trans = node[key](newValue);
-              }
-            });
-          }
-        })(key, value));
+        _fn(key, value);
       }
-      return _results;
+    };
+    applyEvents = function(node, element, events) {
+      var key, value, _fn;
+      _fn = function(key, value) {
+        return node.on(key, function(evt) {
+          return value(element, evt);
+        });
+      };
+      for (key in events) {
+        if (!__hasProp.call(events, key)) continue;
+        value = events[key];
+        _fn(key, value);
+      }
     };
     redraw = function(node) {
       var drawTarget, layer;
@@ -122,6 +134,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
           }
           element._kk = node;
           applyAnimations(node, allBindingsAccessor()['animate']);
+          applyEvents(node, element, allBindingsAccessor()['events']);
           return {
             controlsDescendantBindings: true
           };
