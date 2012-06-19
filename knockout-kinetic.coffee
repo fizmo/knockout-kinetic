@@ -18,13 +18,17 @@ do (factory = (ko, exports) ->
       do (key, value) ->
         trans = null
         if typeof node[key] == 'function'
-          fn = (value) -> node[key](value)
+          fn = (value) ->
+            try
+              node[key](value)
+            catch error
+              return
           if ko.isSubscribable value
             value.subscribe (newValue) ->
               if trans then trans.stop()
               trans = fn newValue if newValue
           else
-            fn value if value
+            fn value if value?
     return
 
   applyEvents = (node, element, events) ->
@@ -86,6 +90,13 @@ do (factory = (ko, exports) ->
       node.setAttrs(config)
       redraw node
 
+  register = (name, factory) ->
+    ko.bindingHandlers[name] = makeBindingHandler factory
+    ko.virtualElements.allowedBindings[name] = true
+
+  exports['knockout-kinetic'] ||= {}
+  exports['knockout-kinetic']['register'] = register
+
   for nodeType, ctor of Kinetic when typeof ctor == 'function'
     nodeFactory = do (nodeType, ctor) ->
       if nodeType == 'Stage'
@@ -95,9 +106,7 @@ do (factory = (ko, exports) ->
       else
         (config) -> new ctor(config)
 
-    bindingName = "Kinetic.#{nodeType}"
-    ko.bindingHandlers[bindingName] = makeBindingHandler nodeFactory
-    ko.virtualElements.allowedBindings[bindingName] = true
+    register "Kinetic.#{nodeType}", nodeFactory
 
   return
 ) ->

@@ -19,7 +19,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
       return factory(ko, ko.kinetic = {});
     }
   })(function(ko, exports) {
-    var applyAnimations, applyEvents, bindingName, ctor, expandConfig, makeBindingHandler, nodeFactory, nodeType, redraw;
+    var applyAnimations, applyEvents, ctor, expandConfig, makeBindingHandler, nodeFactory, nodeType, redraw, register;
     expandConfig = function(config) {
       var key, realValue, result, value, _ref;
       result = {};
@@ -40,7 +40,11 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
         trans = null;
         if (typeof node[key] === 'function') {
           fn = function(value) {
-            return node[key](value);
+            try {
+              return node[key](value);
+            } catch (error) {
+
+            }
           };
           if (ko.isSubscribable(value)) {
             return value.subscribe(function(newValue) {
@@ -52,7 +56,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
               }
             });
           } else {
-            if (value) {
+            if (value != null) {
               return fn(value);
             }
           }
@@ -157,6 +161,12 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
         }
       };
     };
+    register = function(name, factory) {
+      ko.bindingHandlers[name] = makeBindingHandler(factory);
+      return ko.virtualElements.allowedBindings[name] = true;
+    };
+    exports['knockout-kinetic'] || (exports['knockout-kinetic'] = {});
+    exports['knockout-kinetic']['register'] = register;
     for (nodeType in Kinetic) {
       ctor = Kinetic[nodeType];
       if (!(typeof ctor === 'function')) {
@@ -174,9 +184,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
           };
         }
       })(nodeType, ctor);
-      bindingName = "Kinetic." + nodeType;
-      ko.bindingHandlers[bindingName] = makeBindingHandler(nodeFactory);
-      ko.virtualElements.allowedBindings[bindingName] = true;
+      register("Kinetic." + nodeType, nodeFactory);
     }
   });
 
