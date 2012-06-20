@@ -56,32 +56,86 @@ do (factory = (ko, exports) ->
       clearTimeout drawTarget._kktimeout
       drawTarget._kktimeout = setTimeout (do (drawTarget) -> -> drawTarget.draw()), 1
 
+  # For given virtual elements 'ancestor' and 'element' that represent
+  # Kinetic nodes, find element's index within the set of elements that
+  # share its parent Kinetic node.
+  #
+  # Because of the way the binding works, we know when this is called that
+  # there will be no Kinetic nodes between 'ancestor' and 'element', though
+  # there may be other non-Kinetic virtual elements. Thus only one level of
+  # indexing needs to be tracked, as we won't descend into virtual elements
+  # that implement Kinetic nodes.
+  getKineticContainerIndex = (ancestor, element, state = { index: 0 }) ->
+    isKineticBinding = (e) -> e._kk?
+
+    child = ko.virtualElements.firstChild ancestor
+    while child?
+      if child._kk is element._kk then return state.index
+      if isKineticBinding child
+        state.index += 1
+      else
+        result = getKineticContainerIndex child, element, state
+        if result >= 0 then return result
+      child = ko.virtualElements.nextSibling child
+     
+    -1
+
   makeBindingHandler = (nodeFactory) ->
     init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) ->
       config = expandConfig valueAccessor()
       node = nodeFactory config, element.parentNode
+      element._kk = node
 
-      innerContext = bindingContext.createChildContext viewModel 
-      ko.utils.extend innerContext, parentNode: node
+      innerContext = bindingContext.createChildContext viewModel
+      ko.utils.extend innerContext, 'knockout-kinetic':
+        parentElement: element
+        parentNode: node
       ko.applyBindingsToDescendants innerContext, element
 
-      parentNode = bindingContext.parentNode
-      if parentNode
-        parentNode.add node
-        ko.utils.domNodeDisposal.addDisposeCallback element, do (node) -> ->
-          # Kinetic cascade removes children, so check if it's contained.
-          # Kinetic also does not have a cheap check for this, so linear scan we go
-          parent = node.getParent()
-          if not parent then return
-          for child in parent.children when child is node
-            parent.remove node
-            redraw parent
-            break
+      kk = bindingContext['knockout-kinetic'] || {}
+      if kk.parentNode
+        # We need to ensure that the current node is placed in its container
+        # at the same index as the virtual element is within the containing
+        # element.
+        #
+        # Obstacles:
+        #
+        # 1. Knockout does not provide an API to obtain the containing element
+        #    of a virtual element.
+        #    a. Virtual elements don't follow DOM nesting rules (they are all
+        #       just comments, so they are siblings to the elements they
+        #       "contain").
+        #    b. The "containing" element may be a non knockout-kinetic element
+        #       like "with" or "foreach", which must be traversed through to
+        #       find the Kinetic container.
+        #    c. The "sibling" elements may not actually be virtualBindings
+        #       (plain text elements, etc) so we need to check of they have
+        #       a Kinetic binding on them or they don't count.
+        #    These bits are done in 'getKineticContainerIndex' above
+        #
+        # 2. Kinetic does not provide an API to insert elements in the middle
+        #    of a container. Instead, one adds the element to the container
+        #    and then calls 'setZIndex' to specify where in the stack it should
+        #    go. (This mechanism implicitly modifies the zIndex of siblings).
+        kk.parentNode.add node
+        index = getKineticContainerIndex kk.parentElement, element
+        if index < 0 then throw new Error("element not contained within parent")
+        node.setZIndex index
+
+      ko.utils.domNodeDisposal.addDisposeCallback element, do (node) -> ->
+        # Kinetic cascade removes children, so check if it's contained.
+        # Kinetic also does not have a cheap check for this, so linear scan we go
+        parent = node.getParent()
+        if not parent then return
+        for child in parent.children when child is node
+          parent.remove node
+          redraw parent
+          break
 
       element.style.display = 'none' if element.style # won't have style if it's virtual
-      element._kk = node
       applyAnimations node, allBindingsAccessor()['animate']
       applyEvents node, element, allBindingsAccessor()['events']
+
       { controlsDescendantBindings: true }
 
     update: (element, valueAccessor) ->
@@ -94,8 +148,7 @@ do (factory = (ko, exports) ->
     ko.bindingHandlers[name] = makeBindingHandler factory
     ko.virtualElements.allowedBindings[name] = true
 
-  exports['knockout-kinetic'] ||= {}
-  exports['knockout-kinetic']['register'] = register
+  exports['register'] = register
 
   for nodeType, ctor of Kinetic when typeof ctor == 'function'
     nodeFactory = do (nodeType, ctor) ->
