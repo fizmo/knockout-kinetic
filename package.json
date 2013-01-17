@@ -2,7 +2,7 @@
   "author": "Christopher Currie <christopher@currie.com>",
   "name": "knockout-kinetic",
   "description": "Knockout plugin for KineticJS",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "homepage": "https://github.com/christophercurrie/knockout-kinetic",
   "repository": {
     "type": "git",

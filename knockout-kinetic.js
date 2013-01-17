@@ -19,7 +19,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
       return factory(ko, ko.kinetic = {});
     }
   })(function(ko, exports) {
-    var applyAnimations, applyEvents, ctor, expandConfig, makeBindingHandler, nodeFactory, nodeType, redraw, register;
+    var applyAnimations, applyEvents, ctor, expandConfig, getKineticContainerIndex, makeBindingHandler, nodeFactory, nodeType, redraw, register;
     expandConfig = function(config) {
       var key, realValue, result, value, _ref;
       result = {};
@@ -106,46 +106,81 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
         })(drawTarget), 1);
       }
     };
+    getKineticContainerIndex = function(ancestor, element, state) {
+      var child, isKineticBinding, result;
+      if (state == null) {
+        state = {
+          index: 0
+        };
+      }
+      isKineticBinding = function(e) {
+        return e._kk != null;
+      };
+      child = ko.virtualElements.firstChild(ancestor);
+      while (child != null) {
+        if (child._kk === element._kk) {
+          return state.index;
+        }
+        if (isKineticBinding(child)) {
+          state.index += 1;
+        } else {
+          result = getKineticContainerIndex(child, element, state);
+          if (result >= 0) {
+            return result;
+          }
+        }
+        child = ko.virtualElements.nextSibling(child);
+      }
+      return -1;
+    };
     makeBindingHandler = function(nodeFactory) {
       return {
         init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-          var config, innerContext, node, parentNode;
+          var config, index, innerContext, kk, node;
           config = expandConfig(valueAccessor());
           node = nodeFactory(config, element.parentNode);
+          element._kk = node;
           innerContext = bindingContext.createChildContext(viewModel);
           ko.utils.extend(innerContext, {
-            parentNode: node
+            'knockout-kinetic': {
+              parentElement: element,
+              parentNode: node
+            }
           });
           ko.applyBindingsToDescendants(innerContext, element);
-          parentNode = bindingContext.parentNode;
-          if (parentNode) {
-            parentNode.add(node);
-            ko.utils.domNodeDisposal.addDisposeCallback(element, (function(node) {
-              return function() {
-                var child, parent, _i, _len, _ref, _results;
-                parent = node.getParent();
-                if (!parent) {
-                  return;
-                }
-                _ref = parent.children;
-                _results = [];
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  child = _ref[_i];
-                  if (!(child === node)) {
-                    continue;
-                  }
-                  parent.remove(node);
-                  redraw(parent);
-                  break;
-                }
-                return _results;
-              };
-            })(node));
+          kk = bindingContext['knockout-kinetic'] || {};
+          if (kk.parentNode) {
+            kk.parentNode.add(node);
+            index = getKineticContainerIndex(kk.parentElement, element);
+            if (index < 0) {
+              throw new Error("element not contained within parent");
+            }
+            node.setZIndex(index);
           }
+          ko.utils.domNodeDisposal.addDisposeCallback(element, (function(node) {
+            return function() {
+              var child, parent, _i, _len, _ref, _results;
+              parent = node.getParent();
+              if (!parent) {
+                return;
+              }
+              _ref = parent.children;
+              _results = [];
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                child = _ref[_i];
+                if (!(child === node)) {
+                  continue;
+                }
+                parent.remove(node);
+                redraw(parent);
+                break;
+              }
+              return _results;
+            };
+          })(node));
           if (element.style) {
             element.style.display = 'none';
           }
-          element._kk = node;
           applyAnimations(node, allBindingsAccessor()['animate']);
           applyEvents(node, element, allBindingsAccessor()['events']);
           return {
@@ -165,8 +200,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
       ko.bindingHandlers[name] = makeBindingHandler(factory);
       return ko.virtualElements.allowedBindings[name] = true;
     };
-    exports['knockout-kinetic'] || (exports['knockout-kinetic'] = {});
-    exports['knockout-kinetic']['register'] = register;
+    exports['register'] = register;
     for (nodeType in Kinetic) {
       ctor = Kinetic[nodeType];
       if (!(typeof ctor === 'function')) {
