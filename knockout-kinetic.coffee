@@ -32,8 +32,16 @@ do (factory = (ko, exports) ->
     return
 
   applyEvents = (node, element, events) ->
+    # Remove all knockout events
+    removeEvents = []
+    for own baseName, listeners of node.eventListeners
+      for listener in listeners
+        if listener.name is 'knockout'
+          removeEvents.push baseName
+    node.off "#{name}.knockout" for name in removeEvents
+
     for own key, value of events
-      do (key, value) -> node.on key, (evt) ->
+      do (key, value) -> node.on "#{key}.knockout", (evt) ->
         value element, evt
     return
 
@@ -82,7 +90,8 @@ do (factory = (ko, exports) ->
 
   makeBindingHandler = (nodeFactory) ->
     init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) ->
-      config = expandConfig valueAccessor()
+      params = expandConfig valueAccessor()
+      config = if (params.config or params.animate or params.events) then params.config else params
       node = nodeFactory config, element.parentNode
       element._kk = node
 
@@ -133,15 +142,18 @@ do (factory = (ko, exports) ->
           break
 
       element.style.display = 'none' if element.style # won't have style if it's virtual
-      applyAnimations node, allBindingsAccessor()['animate']
-      applyEvents node, element, allBindingsAccessor()['events']
+      applyAnimations node, params.animate
+      applyEvents node, element, params.events
 
       { controlsDescendantBindings: true }
 
     update: (element, valueAccessor) ->
       node = element._kk
-      config = expandConfig valueAccessor()
+      params = expandConfig valueAccessor()
+      config = if params.config or params.events or params.animate then params.config else params
       node.setAttrs(config)
+      applyAnimations node, params.animate
+      applyEvents node, element, params.events
       redraw node
 
   register = (name, factory) ->
