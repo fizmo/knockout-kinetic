@@ -6,5 +6,8 @@
     "**/.*",
     "node_modules",
     "components"
-  ]
+  ],
+  "dependencies": {
+    "knockout": "~2.2.1"
+  }
 }
