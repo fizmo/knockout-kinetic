@@ -1,0 +1,10 @@
+{
+  "name": "knockout-kinetic",
+  "version": "0.1.4",
+  "main": "knockout-kinetic.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ]
+}
