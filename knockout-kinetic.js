@@ -152,20 +152,18 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
     };
     applyInteractivityEventsCallback = function(node, valueAccessor) {
       return node.on("pointerup mouseup dragend mouseout", function() {
-        var attr, attributes, values, _i, _len;
+        var attr, attributes, values;
         attributes = node.getAttrs();
         values = valueAccessor();
-        for (_i = 0, _len = attributes.length; _i < _len; _i++) {
-          attr = attributes[_i];
+        for (attr in attributes) {
           if (!attributes.hasOwnProperty(attr)) {
             continue;
           }
+          if (values.hasOwnProperty(attr)) {
+            values[attr](attributes[attr]);
+          }
         }
-        if (values.hasOwnProperty(attr)) {
-          return values[attr](attributes[attr]);
-        } else {
-
-        }
+        return null;
       });
     };
     makeBindingHandler = function(nodeFactory) {

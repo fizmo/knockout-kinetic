@@ -94,9 +94,10 @@ do (factory = (ko, exports) ->
    node.on "pointerup mouseup dragend mouseout", ->
      attributes = node.getAttrs()
      values = valueAccessor()
-     for attr in attributes
+     for attr of attributes
        continue  unless attributes.hasOwnProperty(attr)
-      if values.hasOwnProperty(attr) then values[attr](attributes[attr]) else
+       values[attr] attributes[attr] if values.hasOwnProperty(attr)
+     null
 
   makeBindingHandler = (nodeFactory) ->
     init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) ->
