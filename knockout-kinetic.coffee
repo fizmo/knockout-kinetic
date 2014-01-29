@@ -149,7 +149,7 @@ do (factory = (ko, exports) ->
         parent = node.getParent()
         if not parent then return
         for child in parent.children when child is node
-          node.remove
+          node.remove()
           redraw parent
           break
 

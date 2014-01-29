@@ -208,7 +208,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
                 if (!(child === node)) {
                   continue;
                 }
-                node.remove;
+                node.remove();
                 redraw(parent);
                 break;
               }
