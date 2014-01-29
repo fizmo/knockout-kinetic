@@ -88,7 +88,7 @@ do (factory = (ko, exports) ->
      
     -1
 
-# Apply callback for shapes for update ViewModel 
+# Apply callback to shapes for update ViewModel 
 # when shapes attributes was changed
   applyInteractivityEventsCallback = (node, valueAccessor) ->
    node.on "pointerup mouseup dragend mouseout", ->
