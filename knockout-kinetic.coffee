@@ -1,6 +1,6 @@
 ###
 Knockout Kinetic plugin version 0.1.4
-Copyright 2012 Christopher Currie - https://github.com/christophercurrie
+Copyright 2014 Christopher Currie - https://github.com/christophercurrie
 License: MIT (http://www.opensource.org/licenses/mit-license.php)
 ###
 
@@ -88,6 +88,17 @@ do (factory = (ko, exports) ->
      
     -1
 
+# Apply callback to shapes for update ViewModel 
+# when shapes attributes was changed
+  applyInteractivityEventsCallback = (node, valueAccessor) ->
+   node.on "pointerup mouseup dragend mouseout", ->
+     attributes = node.getAttrs()
+     values = valueAccessor()
+     for attr of attributes
+       continue  unless attributes.hasOwnProperty(attr)
+       values[attr] attributes[attr] if values.hasOwnProperty(attr)
+     null
+
   makeBindingHandler = (nodeFactory) ->
     init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) ->
       params = expandConfig valueAccessor()
@@ -100,6 +111,8 @@ do (factory = (ko, exports) ->
         parentElement: element
         parentNode: node
       ko.applyBindingsToDescendants innerContext, element
+
+      applyInteractivityEventsCallback node, valueAccessor
 
       kk = bindingContext['knockout-kinetic'] || {}
       if kk.parentNode
@@ -137,7 +150,7 @@ do (factory = (ko, exports) ->
         parent = node.getParent()
         if not parent then return
         for child in parent.children when child is node
-          parent.remove node
+          node.remove()
           redraw parent
           break
 
@@ -149,11 +162,13 @@ do (factory = (ko, exports) ->
 
     update: (element, valueAccessor) ->
       node = element._kk
+      parent = node.getParent() or null
       params = expandConfig valueAccessor()
       config = if params.config or params.events or params.animate then params.config else params
       node.setAttrs(config)
       applyAnimations node, params.animate
       applyEvents node, element, params.events
+      redraw parent  if parent
       redraw node
 
   register = (name, factory) ->
