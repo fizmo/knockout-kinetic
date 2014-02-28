@@ -1,5 +1,5 @@
 ###
-Knockout Kinetic plugin version 0.1.4
+Knockout Kinetic plugin version 0.1.5
 Copyright 2014 Christopher Currie - https://github.com/christophercurrie
 License: MIT (http://www.opensource.org/licenses/mit-license.php)
 ###
