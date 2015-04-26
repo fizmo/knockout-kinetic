@@ -1,12 +1,12 @@
 {
   "author": "Christopher Currie <christopher@currie.com>",
-  "name": "knockout-kinetic",
-  "description": "Knockout plugin for KineticJS",
+  "name": "knockout-konva",
+  "description": "Knockout plugin for KonvaJS",
   "version": "0.1.4",
-  "homepage": "https://github.com/christophercurrie/knockout-kinetic",
+  "homepage": "https://github.com/christophercurrie/knockout-konva",
   "repository": {
     "type": "git",
-    "url": "git://github.com/christophercurrie/knockout-kinetic.git"
+    "url": "git://github.com/christophercurrie/knockout-konva.git"
   },
   "devDependencies": {
     "coffee-script": "1.3.3"

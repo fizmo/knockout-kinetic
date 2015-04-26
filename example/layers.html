@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Kinetic Layering test</title>
+    <title>Konva Layering test</title>
     <script type="text/javascript" src="knockout-2.1.0.debug.js"></script>
     <script type="text/javascript" src="../coffee-script.js"></script>
-    <script type="text/javascript" src="kinetic-v3.10.0.js"></script>
-    <script type="text/coffeescript" src="../knockout-kinetic.coffee"></script>
+    <script type="text/javascript" src="konva-v3.10.0.js"></script>
+    <script type="text/coffeescript" src="../knockout-konva.coffee"></script>
     <style type="text/css">
     </style>
   </head>  
   <body>
     <div id="container">
-      <!-- ko Kinetic.Stage: { width: 500, height: 500 } -->
+      <!-- ko Konva.Stage: { width: 500, height: 500 } -->
       <!--   ko with: first -->
-      <!--     ko Kinetic.Layer: { } -->
-      <!--       ko Kinetic.Text: { height: 500, width: 500, textFill: "black", text: $data, fill: "white" } -->
+      <!--     ko Konva.Layer: { } -->
+      <!--       ko Konva.Text: { height: 500, width: 500, textFill: "black", text: $data, fill: "white" } -->
       <!--       /ko -->
       <!--     /ko -->
       <!--   /ko -->
-      <!--   ko Kinetic.Layer: { } -->
-      <!--     ko Kinetic.Text: second -->
+      <!--   ko Konva.Layer: { } -->
+      <!--     ko Konva.Text: second -->
       <!--     /ko -->
       <!--   /ko -->
       <!-- /ko -->
@@ -28,7 +28,7 @@
     (function(){
         var interval = 0;
         var tryBindings = function() {
-            if (!ko.bindingHandlers['Kinetic.Stage']) return;
+            if (!ko.bindingHandlers['Konva.Stage']) return;
             clearInterval(interval);
             var vm = {
                 first: ko.observable("I should be on bottom!"),

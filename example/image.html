@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>A Knockout/Kinetic example</title>
-    <script type="text/javascript" src="kinetic-v3.10.0.js"></script>
+    <title>A Knockout/Konva example</title>
+    <script type="text/javascript" src="konva-v3.10.0.js"></script>
     <script type="text/javascript" src="knockout-2.1.0.debug.js"></script>
     <script type="text/javascript" src="../coffee-script.js"></script>
-    <script type="text/coffeescript" src="../knockout-kinetic.coffee"></script>
+    <script type="text/coffeescript" src="../knockout-konva.coffee"></script>
   </head>
   <body>
     <!-- 
     This example is from the 'Image' tutorial:
     -->
     <div id="container">
-      <!-- ko Kinetic.Stage: { width: 578, height: 200 } -->
-      <!--     ko Kinetic.Layer: { } -->
-      <!--         ko Kinetic.Image: { x: 578 / 2 - 53, y: 200 / 2 - 59, image: image, width: 106, height: 118 } -->
+      <!-- ko Konva.Stage: { width: 578, height: 200 } -->
+      <!--     ko Konva.Layer: { } -->
+      <!--         ko Konva.Image: { x: 578 / 2 - 53, y: 200 / 2 - 59, image: image, width: 106, height: 118 } -->
       <!--         /ko -->
       <!--     /ko -->
       <!-- /ko -->
@@ -23,7 +23,7 @@
         (function () {
             var interval = 0;
             var tryBindings = function() {
-                if (!ko.bindingHandlers['Kinetic.Stage']) return;
+                if (!ko.bindingHandlers['Konva.Stage']) return;
                 clearInterval(interval);
                 var viewModel = {
                     image: ko.observable()

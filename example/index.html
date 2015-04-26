@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>A Knockout/Kinetic example</title>
-    <script type="text/javascript" src="kinetic-v3.10.0.js"></script>
+    <title>A Knockout/Konva example</title>
+    <script type="text/javascript" src="konva.js"></script>
     <script type="text/javascript" src="knockout-2.1.0.debug.js"></script>
-    <script type="text/javascript" src="../knockout-kinetic.js"></script>
+    <script type="text/javascript" src="../knockout-konva.js"></script>
   </head>
   <body>
     <!-- 
     This example is from the 'Rect' tutorial:
-    http://www.html5canvastutorials.com/kineticjs/html5-canvas-kineticjs-rect-tutorial/
+    http://www.html5canvastutorials.com/konvajs/html5-canvas-konvajs-rect-tutorial/
     -->
-    <div id="container">
+    
       <!-- Look, ma! No JavaScript! -->
-      <!-- ko Kinetic.Stage: { width: 578, height: 200 } -->
-      <!--     ko Kinetic.Layer: { } -->
-      <!--         ko Kinetic.Rect: { x: 239, y: 75, width: 100, height: 50, fill: "#00D2FF", stroke: "black", strokeWidth: 4 } -->
+      <!-- ko Konva.Stage: { width: 578, height: 200 } -->
+      <!--     ko Konva.Layer: { } -->
+      <!--         ko Konva.Rect: { x: 239, y: 75, width: 100, height: 50, fill: "#00D2FF", stroke: "black", strokeWidth: 4 } -->
       <!--         /ko -->
       <!--     /ko -->
       <!-- /ko -->
-    </div>
+     
     <script type="text/javascript">
         // Ok, a *little* JavaScript...
         ko.applyBindings();

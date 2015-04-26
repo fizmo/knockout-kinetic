@@ -1,5 +1,5 @@
 ###
-Knockout Kinetic plugin version 0.1.5
+Knockout Konva plugin version 0.1.5
 Copyright 2014 Christopher Currie - https://github.com/christophercurrie
 License: MIT (http://www.opensource.org/licenses/mit-license.php)
 ###
@@ -65,24 +65,24 @@ do (factory = (ko, exports) ->
       drawTarget._kktimeout = setTimeout (do (drawTarget) -> -> drawTarget.draw()), 1
 
   # For given virtual elements 'ancestor' and 'element' that represent
-  # Kinetic nodes, find element's index within the set of elements that
-  # share its parent Kinetic node.
+  # Konva nodes, find element's index within the set of elements that
+  # share its parent Konva node.
   #
   # Because of the way the binding works, we know when this is called that
-  # there will be no Kinetic nodes between 'ancestor' and 'element', though
-  # there may be other non-Kinetic virtual elements. Thus only one level of
+  # there will be no Konva nodes between 'ancestor' and 'element', though
+  # there may be other non-Konva virtual elements. Thus only one level of
   # indexing needs to be tracked, as we won't descend into virtual elements
-  # that implement Kinetic nodes.
-  getKineticContainerIndex = (ancestor, element, state = { index: 0 }) ->
-    isKineticBinding = (e) -> e._kk?
+  # that implement Konva nodes.
+  getKonvaContainerIndex = (ancestor, element, state = { index: 0 }) ->
+    isKonvaBinding = (e) -> e._kk?
 
     child = ko.virtualElements.firstChild ancestor
     while child?
       if child._kk is element._kk then return state.index
-      if isKineticBinding child
+      if isKonvaBinding child
         state.index += 1
       else
-        result = getKineticContainerIndex child, element, state
+        result = getKonvaContainerIndex child, element, state
         if result >= 0 then return result
       child = ko.virtualElements.nextSibling child
      
@@ -107,14 +107,14 @@ do (factory = (ko, exports) ->
       element._kk = node
 
       innerContext = bindingContext.createChildContext viewModel
-      ko.utils.extend innerContext, 'knockout-kinetic':
+      ko.utils.extend innerContext, 'knockout-konva':
         parentElement: element
         parentNode: node
       ko.applyBindingsToDescendants innerContext, element
 
       applyInteractivityEventsCallback node, valueAccessor
 
-      kk = bindingContext['knockout-kinetic'] || {}
+      kk = bindingContext['knockout-konva'] || {}
       if kk.parentNode
         # We need to ensure that the current node is placed in its container
         # at the same index as the virtual element is within the containing
@@ -127,26 +127,26 @@ do (factory = (ko, exports) ->
         #    a. Virtual elements don't follow DOM nesting rules (they are all
         #       just comments, so they are siblings to the elements they
         #       "contain").
-        #    b. The "containing" element may be a non knockout-kinetic element
+        #    b. The "containing" element may be a non knockout-konva element
         #       like "with" or "foreach", which must be traversed through to
-        #       find the Kinetic container.
+        #       find the Konva container.
         #    c. The "sibling" elements may not actually be virtualBindings
         #       (plain text elements, etc) so we need to check of they have
-        #       a Kinetic binding on them or they don't count.
-        #    These bits are done in 'getKineticContainerIndex' above
+        #       a Konva binding on them or they don't count.
+        #    These bits are done in 'getKonvaContainerIndex' above
         #
-        # 2. Kinetic does not provide an API to insert elements in the middle
+        # 2. Konva does not provide an API to insert elements in the middle
         #    of a container. Instead, one adds the element to the container
         #    and then calls 'setZIndex' to specify where in the stack it should
         #    go. (This mechanism implicitly modifies the zIndex of siblings).
         kk.parentNode.add node
-        index = getKineticContainerIndex kk.parentElement, element
+        index = getKonvaContainerIndex kk.parentElement, element
         if index < 0 then throw new Error("element not contained within parent")
         node.setZIndex index
 
       ko.utils.domNodeDisposal.addDisposeCallback element, do (node) -> ->
-        # Kinetic cascade removes children, so check if it's contained.
-        # Kinetic also does not have a cheap check for this, so linear scan we go
+        # Konva cascade removes children, so check if it's contained.
+        # Konva also does not have a cheap check for this, so linear scan we go
         parent = node.getParent()
         if not parent then return
         for child in parent.children when child is node
@@ -177,16 +177,18 @@ do (factory = (ko, exports) ->
 
   exports['register'] = register
 
-  for nodeType, ctor of Kinetic when typeof ctor == 'function'
+  for nodeType, ctor of Konva when typeof ctor == 'function'
     nodeFactory = do (nodeType, ctor) ->
       if nodeType == 'Stage'
         (config, parent) ->
-          config['container'] = parent
+          div = document.createElement('div')
+          parent.appendChild(div)
+          config['container'] = div
           new ctor(config)
       else
         (config) -> new ctor(config)
 
-    register "Kinetic.#{nodeType}", nodeFactory
+    register "Konva.#{nodeType}", nodeFactory
 
   return
 ) ->
@@ -200,6 +202,6 @@ do (factory = (ko, exports) ->
     # AMD anonymous module with hard-coded dependency on 'knockout'
     define(['knockout', 'exports'], factory)
   else
-    # <script> tag: use the global `ko` object, attaching a `kinetic` property
-    factory(ko, ko.kinetic = {})
+    # <script> tag: use the global `ko` object, attaching a `konva` property
+    factory(ko, ko.konva = {})
 

@@ -1,7 +1,7 @@
 {
-  "name": "knockout-kinetic",
+  "name": "knockout-konva",
   "version": "0.1.5",
-  "main": "knockout-kinetic.js",
+  "main": "knockout-konva.js",
   "ignore": [
     "**/.*",
     "node_modules",
