@@ -1,3 +1,8 @@
+*DEPRECATED*: This project has not been updated since Kinetic 3, and Kinetic
+itself has been retired, and replaced by Konvajs. A fork of this project
+supporting Konvajs [is maintained by Harry McIntyre][5].
+
+
 knockout-kinetic
 ================
 
@@ -62,3 +67,4 @@ great way to get my attention. :)
 [2]: http://www.kineticjs.com/
 [3]: http://knockoutjs.com/documentation/custom-bindings-for-virtual-elements.html
 [4]: https://github.com/christophercurrie/knockout-kinetic/issues
+[5]: https://github.com/mcintyre321/knockout-konva
