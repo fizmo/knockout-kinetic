@@ -3,10 +3,12 @@ knockout-konva
 
 A KonvaJS plugin for KnockoutJS.
 
+Example: http://jsfiddle.net/mcintyre321/304essdv/
+
 Overview
 --------
 
-This is a fork of [Christopher Currie's Knockout-Kinetic plugin](5) for working with Konva JS
+This is a fork of [Christopher Curries' Knockout-Kinetic plugin](5)  
 
 This package is designed to enable using the data-binding awesomeness of
 [KnockoutJS][1] with the HTML5 Canvas drawing wizardy of [KonvaJS][2]. Fun
