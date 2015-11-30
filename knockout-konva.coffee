@@ -96,7 +96,7 @@ do (factory = (ko, exports, Konva) ->
      values = valueAccessor()
      for attr of attributes
        continue  unless attributes.hasOwnProperty(attr)
-       values[attr] attributes[attr] if values.hasOwnProperty(attr)
+       values[attr] attributes[attr] if values.hasOwnProperty(attr) and ko.isObservable(values[attr])
      null
 
   makeBindingHandler = (nodeFactory) ->

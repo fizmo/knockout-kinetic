@@ -158,7 +158,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
           if (!attributes.hasOwnProperty(attr)) {
             continue;
           }
-          if (values.hasOwnProperty(attr)) {
+          if (values.hasOwnProperty(attr) && ko.isObservable(values[attr])) {
             values[attr](attributes[attr]);
           }
         }
