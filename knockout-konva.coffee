@@ -152,7 +152,11 @@ do (factory = (ko, exports, Konva) ->
         for child in parent.children when child is node
           node.remove()
           clearTimeout(node._kktimeout)
-          redraw parent
+          layer = parent.getLayer()
+          if (layer)
+            redraw layer
+          else
+            redraw parent
           break
 
       element.style.display = 'none' if element.style # won't have style if it's virtual

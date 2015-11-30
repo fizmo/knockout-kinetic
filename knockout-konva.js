@@ -193,7 +193,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
           }
           ko.utils.domNodeDisposal.addDisposeCallback(element, (function(node) {
             return function() {
-              var child, i, len, parent, ref, results;
+              var child, i, layer, len, parent, ref, results;
               parent = node.getParent();
               if (!parent) {
                 return;
@@ -207,7 +207,12 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
                 }
                 node.remove();
                 clearTimeout(node._kktimeout);
-                redraw(parent);
+                layer = parent.getLayer();
+                if (layer) {
+                  redraw(layer);
+                } else {
+                  redraw(parent);
+                }
                 break;
               }
               return results;
