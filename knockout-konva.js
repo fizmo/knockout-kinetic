@@ -206,6 +206,7 @@ License: MIT (http://www.opensource.org/licenses/mit-license.php)
                   continue;
                 }
                 node.remove();
+                clearTimeout(node._kktimeout);
                 redraw(parent);
                 break;
               }

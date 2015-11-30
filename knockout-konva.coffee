@@ -151,6 +151,7 @@ do (factory = (ko, exports, Konva) ->
         if not parent then return
         for child in parent.children when child is node
           node.remove()
+          clearTimeout(node._kktimeout)
           redraw parent
           break
 
