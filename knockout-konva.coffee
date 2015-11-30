@@ -4,7 +4,7 @@ Copyright 2014 Christopher Currie - https://github.com/christophercurrie
 License: MIT (http://www.opensource.org/licenses/mit-license.php)
 ###
 
-do (factory = (ko, exports) ->
+do (factory = (ko, exports, Konva) ->
 
   expandConfig = (config) ->
       result = {}
@@ -96,7 +96,7 @@ do (factory = (ko, exports) ->
      values = valueAccessor()
      for attr of attributes
        continue  unless attributes.hasOwnProperty(attr)
-       values[attr] attributes[attr] if values.hasOwnProperty(attr)
+       values[attr] attributes[attr] if values.hasOwnProperty(attr) and ko.isObservable(values[attr])
      null
 
   makeBindingHandler = (nodeFactory) ->
@@ -151,7 +151,12 @@ do (factory = (ko, exports) ->
         if not parent then return
         for child in parent.children when child is node
           node.remove()
-          redraw parent
+          clearTimeout(node._kktimeout)
+          layer = parent.getLayer()
+          if (layer)
+            redraw layer
+          else
+            redraw parent
           break
 
       element.style.display = 'none' if element.style # won't have style if it's virtual
@@ -197,11 +202,11 @@ do (factory = (ko, exports) ->
 
   if typeof require == 'function' && typeof exports == 'object' && typeof module == 'object'
     # CommonJS or Node: hard-coded dependency on 'knockout'
-    factory(require('knockout'), exports)
+    factory(require('knockout'), exports, require('konva'))
   else if typeof define == 'function' && define['amd']
     # AMD anonymous module with hard-coded dependency on 'knockout'
-    define(['knockout', 'exports'], factory)
+    define(['knockout', 'exports', 'konva'], factory)
   else
     # <script> tag: use the global `ko` object, attaching a `konva` property
-    factory(ko, ko.konva = {})
+    factory(ko, ko.konva = {}, Konva)
 
