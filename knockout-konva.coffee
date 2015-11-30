@@ -4,7 +4,7 @@ Copyright 2014 Christopher Currie - https://github.com/christophercurrie
 License: MIT (http://www.opensource.org/licenses/mit-license.php)
 ###
 
-do (factory = (ko, exports) ->
+do (factory = (ko, exports, Konva) ->
 
   expandConfig = (config) ->
       result = {}
@@ -197,11 +197,11 @@ do (factory = (ko, exports) ->
 
   if typeof require == 'function' && typeof exports == 'object' && typeof module == 'object'
     # CommonJS or Node: hard-coded dependency on 'knockout'
-    factory(require('knockout'), exports)
+    factory(require('knockout'), exports, require('konva'))
   else if typeof define == 'function' && define['amd']
     # AMD anonymous module with hard-coded dependency on 'knockout'
-    define(['knockout', 'exports'], factory)
+    define(['knockout', 'exports', 'konva'], factory)
   else
     # <script> tag: use the global `ko` object, attaching a `konva` property
-    factory(ko, ko.konva = {})
+    factory(ko, ko.konva = {}, Konva)
 
